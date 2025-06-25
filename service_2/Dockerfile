@@ -1,12 +1,8 @@
-# Build stage
-FROM golang:1.20-alpine as builder
+FROM python:3.11-alpine
+RUN apk add --no-cache curl
 WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
-RUN CGO_ENABLED=0 go build -o service1
-
-# Runtime stage
-FROM alpine:latest
-WORKDIR /app
-COPY --from=builder /app/service1 .
-EXPOSE 5001
-ENTRYPOINT ["/app/service1"]
+EXPOSE 5002
+CMD ["python", "app.py"]

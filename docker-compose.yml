@@ -1,37 +1,39 @@
 version: '3.8'
+
 services:
   nginx:
     build: ./nginx
     ports:
-      - "8080:80"                    # Expose container port 80 on host 8080
+      - "8080:80"
     depends_on:
-      - service1
-      - service2
+      service1:
+        condition: service_healthy
+      service2:
+        condition: service_healthy
     networks:
       - appnet
 
   service1:
     build: ./service_1
-    container_name: service1
-    networks:
-      - appnet
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
-      interval: 30s
-      timeout: 5s
+      interval: 5s
+      timeout: 2s
       retries: 3
+    networks:
+      - appnet
 
   service2:
     build: ./service_2
-    container_name: service2
-    networks:
-      - appnet
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5002/health"]
-      interval: 30s
-      timeout: 5s
+      interval: 5s
+      timeout: 2s
       retries: 3
+    networks:
+      - appnet
 
 networks:
   appnet:
     driver: bridge
+
